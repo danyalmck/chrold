@@ -1,0 +1,53 @@
+name: Train and build the deploy image with latest tag
+
+on: [workflow_dispatch]
+
+env:
+  REGISTRY: ghcr.io
+  LATEST_IMAGE_TAG: latest
+  DOCKER_BUILDKIT: 1
+  REPO_OWNER: ${{ github.repository_owner }}
+  TRAIN_IMAGE_NAME: chrold-train
+  DEPLOY_IMAGE_NAME: chrold-deploy
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.5.3
+
+    - name: Login to registry
+      uses: docker/login-action@v2.2.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pull train image
+      run: docker pull ghcr.io/${{ env.REPO_OWNER }}/${{ env.TRAIN_IMAGE_NAME }}:${{ env.LATEST_IMAGE_TAG }}
+
+    - name: Traning...
+      run: docker run -v "$(pwd)":/app ghcr.io/${{ env.REPO_OWNER }}/${{ env.TRAIN_IMAGE_NAME }}:${{ env.LATEST_IMAGE_TAG }}
+
+    - name: Install mlflow
+      run: |
+        pip install --upgrade pip
+        pip install mlflow
+
+    - name: Build and push latest deploy image
+      env:
+        MY_RUN: $(cat r_id.txt)
+        DATABRICKS_HOST: "${{ secrets.DATABRICKS_HOST }}"
+        DATABRICKS_USERNAME: "${{ secrets.DATABRICKS_USERNAME }}"
+        DATABRICKS_PASSWORD: "${{ secrets.DATABRICKS_PASSWORD }}"
+        MLFLOW_TRACKING_URI: "${{ secrets.MLFLOW_TRACKING_URI }}"
+        MLFLOW_TRACKING_USERNAME: "${{ secrets.MLFLOW_TRACKING_USERNAME }}"
+        MLFLOW_TRACKING_PASSWORD: "${{ secrets.MLFLOW_TRACKING_PASSWORD }}"
+      run: |
+        echo "${{ env.MY_RUN }}"
+        echo "::notice::Run ID: ${{ env.MY_RUN }}"
+        mlflow artifacts download -r "${{ env.MY_RUN }}" -d .
+        mlflow models build-docker --model-uri ./model --name ghcr.io/${{ env.REPO_OWNER }}/${{ env.DEPLOY_IMAGE_NAME }}:${{ env.LATEST_IMAGE_TAG }}
+        docker push ghcr.io/${{ env.REPO_OWNER }}/${{ env.DEPLOY_IMAGE_NAME }}:${{ env.LATEST_IMAGE_TAG }}
