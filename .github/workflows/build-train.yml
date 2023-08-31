@@ -1,0 +1,90 @@
+name: Build and train on tag
+
+on:
+  create:
+    tags:
+      - '*'
+
+env:
+  REGISTRY: ghcr.io
+  BUILD_IMAGE_TAG: $(git rev-parse --short HEAD)
+  LATEST_IMAGE_TAG: latest
+  DEPLOY_TAG: $(git describe --tags --abbrev=0)
+  DOCKER_BUILDKIT: 1
+  REPO_OWNER: ${{ github.repository_owner }}
+  IMAGE_NAME: chrold-train
+  TRAIN_IMAGE_NAME: chrold-train
+  DEPLOY_IMAGE_NAME: chrold-deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.5.3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.9.1
+
+    - name: Login to registry
+      uses: docker/login-action@v2.2.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and Push Docker image
+      run: |
+        docker build -t ghcr.io/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_IMAGE_TAG }} \
+          --build-arg DB_HOST=${{ secrets.DATABRICKS_HOST }} \
+          --build-arg DB_USERNAME=${{ secrets.DATABRICKS_USERNAME }} \
+          --build-arg DB_PASS=${{ secrets.DATABRICKS_PASSWORD }} .
+        docker push ghcr.io/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_IMAGE_TAG }}
+
+    - name: Push by git tag
+      run: |
+        docker tag ghcr.io/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_IMAGE_TAG }} ghcr.io/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
+        docker push ghcr.io/${{ env.REPO_OWNER }}/${{ env.IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
+
+  train:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.5.3
+
+    - name: Login to registry
+      uses: docker/login-action@v2.2.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pull train image
+      run: docker pull ghcr.io/${{ env.REPO_OWNER }}/${{ env.TRAIN_IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
+
+    - name: Traning...
+      run: docker run -v "$(pwd)":/app ghcr.io/${{ env.REPO_OWNER }}/${{ env.TRAIN_IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
+
+    - name: Install mlflow
+      run: |
+        pip install --upgrade pip
+        pip install mlflow
+
+    - name: Build and push deploy image
+      env:
+        MY_RUN: $(cat r_id.txt)
+        DATABRICKS_HOST: "${{ secrets.DATABRICKS_HOST }}"
+        DATABRICKS_USERNAME: "${{ secrets.DATABRICKS_USERNAME }}"
+        DATABRICKS_PASSWORD: "${{ secrets.DATABRICKS_PASSWORD }}"
+        MLFLOW_TRACKING_URI: "${{ secrets.MLFLOW_TRACKING_URI }}"
+        MLFLOW_TRACKING_USERNAME: "${{ secrets.MLFLOW_TRACKING_USERNAME }}"
+        MLFLOW_TRACKING_PASSWORD: "${{ secrets.MLFLOW_TRACKING_PASSWORD }}"
+      run: |
+        echo "${{ env.MY_RUN }}" 
+        echo "::notice::Run ID: ${{ env.MY_RUN }}"
+        mlflow artifacts download -r "${{ env.MY_RUN }}" -d .
+        mlflow models build-docker --model-uri ./model --name ghcr.io/${{ env.REPO_OWNER }}/${{ env.DEPLOY_IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
+        docker push ghcr.io/${{ env.REPO_OWNER }}/${{ env.DEPLOY_IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
