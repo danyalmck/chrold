@@ -12,6 +12,6 @@ mlflow.autolog()
 
 if __name__ == "__main__":
     with mlflow.start_run() as run:
-        run_id = train()
+        run_id = train(False, "")
         with open("r_id.txt", "w") as file:
             file.write(run_id)

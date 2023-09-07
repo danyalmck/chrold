@@ -7,8 +7,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 # Your code
-def train():
+def train(warm_start, run_id):
     df = pd.read_csv("https://kwargs.s3.ir-thr-at1.arvanstorage.ir/Car_prices_classification.csv")
+
+    if warm_start:
+        model = mlflow.sklearn.load_model(f"runs:/{run_id}/model")
+    else:
+        model = LogisticRegression(multi_class='multinomial', solver='newton-cg', max_iter=100)
 
     # Only the column 'generation_name' has NaN values.
     # To handle this issue, we replaced the NaN for each record with the concatenation of its model and mark!
@@ -34,7 +39,6 @@ def train():
     X = transformed_df.drop('remainder__price_class', axis=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
-    model = LogisticRegression(multi_class='multinomial', solver='newton-cg', max_iter=100)
     model.fit(X_train, y_train)
     print(model.score(X_test, y_test))
 
