@@ -7,8 +7,8 @@ env:
   LATEST_IMAGE_TAG: latest
   DOCKER_BUILDKIT: 1
   REPO_OWNER: ${{ github.repository_owner }}
-  TRAIN_IMAGE_NAME: chrold-train
-  DEPLOY_IMAGE_NAME: chrold-deploy
+  TRAIN_IMAGE_NAME: ${{ github.event.repository.name }}-train
+  DEPLOY_IMAGE_NAME: ${{ github.event.repository.name }}-deploy
 
 jobs:
   train:

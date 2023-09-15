@@ -25,5 +25,5 @@ WORKDIR /app
 # Copy your code to the filesystem
 COPY . /app
 
-# Execute the train.py script
+# Execute the main.py script
 CMD ["python", "/app/main.py"]

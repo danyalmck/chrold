@@ -12,9 +12,9 @@ env:
   DEPLOY_TAG: $(git describe --tags --abbrev=0)
   DOCKER_BUILDKIT: 1
   REPO_OWNER: ${{ github.repository_owner }}
-  IMAGE_NAME: chrold-train
-  TRAIN_IMAGE_NAME: chrold-train
-  DEPLOY_IMAGE_NAME: chrold-deploy
+  IMAGE_NAME: ${{ github.event.repository.name }}-train
+  TRAIN_IMAGE_NAME: ${{ github.event.repository.name }}-train
+  DEPLOY_IMAGE_NAME: ${{ github.event.repository.name }}-deploy
 
 jobs:
   build:
