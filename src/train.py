@@ -1,5 +1,5 @@
 import pandas as pd
-from examples import logistic_regression
+from src.examples import logistic_regression
 
 
 # Your code
