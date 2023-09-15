@@ -38,5 +38,5 @@ def train(current_run, warm_start, warm_start_run_id, df):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     model.fit(X_train, y_train)
-    
+
     return model.score(X_test, y_test)
