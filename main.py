@@ -1,8 +1,9 @@
 import mlflow
+import os
 from src.train import train
 
 
-UESRNAME = "dm.enrollment@protonmail.com"
+UESRNAME = os.environ.get("DATABRICKS_USERNAME")
 EXPERIMENT = "chrold-exp1"
 TRACKING_UI = "databricks"
 
