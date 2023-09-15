@@ -7,11 +7,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 # Your code
-def train(warm_start, run_id):
+def train(current_run, warm_start, warm_start_run_id):
     df = pd.read_csv("https://kwargs.s3.ir-thr-at1.arvanstorage.ir/Car_prices_classification.csv")
 
     if warm_start:
-        model = mlflow.sklearn.load_model(f"runs:/{run_id}/model")
+        model = mlflow.sklearn.load_model(f"runs:/{warm_start_run_id}/model")
     else:
         model = LogisticRegression(multi_class='multinomial', solver='newton-cg', max_iter=100)
 
@@ -43,5 +43,5 @@ def train(warm_start, run_id):
     print(model.score(X_test, y_test))
 
     # return id
-    mlflow.log_param("run id", mlflow.active_run().info.run_id)
-    return mlflow.active_run().info.run_id
+    mlflow.log_param("run id", current_run.info.run_id)
+    return current_run.info.run_id
