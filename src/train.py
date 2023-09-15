@@ -11,7 +11,7 @@ def train(current_run, warm_start, warm_start_run_id):
     df = pd.read_csv("https://kwargs.s3.ir-thr-at1.arvanstorage.ir/Car_prices_classification.csv")
 
     if warm_start:
-        model = mlflow.sklearn.load_model(f"runs:/{warm_start_run_id}/model")
+        model = mlflow.pyfunc.load_model(f"runs:/{warm_start_run_id}/model")
     else:
         model = LogisticRegression(multi_class='multinomial', solver='newton-cg', max_iter=100)
 
@@ -42,6 +42,4 @@ def train(current_run, warm_start, warm_start_run_id):
     model.fit(X_train, y_train)
     print(model.score(X_test, y_test))
 
-    # return id
-    mlflow.log_param("run id", current_run.info.run_id)
-    return current_run.info.run_id
+    return
