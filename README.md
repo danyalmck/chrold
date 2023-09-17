@@ -4,9 +4,9 @@ Run your ML commit directly on production
 
 ## In a Nutshell
 
-Chrold is a free and easy-to-use repository template for your Machine Learning project which lets you run your commit directly on production with zero effort.
+Chrold is a free and easy-to-use [repository template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) for your Machine Learning project which lets you run your commit directly on production with zero effort.
 
-It's an MLOps pipeline which builds, trains, tracks your models and finally, you can deploy your desired version as a Docker container on production.
+It's an [MLOps](https://ml-ops.org/) pipeline which builds, trains, tracks your models and finally, you can deploy your desired version as a Docker container on production.
 
 ## Quick Start
 
