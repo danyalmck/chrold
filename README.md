@@ -47,6 +47,11 @@ If you create a tag for a commit, the pipeline, after the building stage automat
 [Runner](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners) fetches the data from your Data source and trains the model. In this way, we address the changes introduced by Hyperparameters, Learning Algorithm and Data source (tag an existing commit).
 ### Track
 During the training phase, runner communicates with your [tracking server](https://mlflow.org/docs/latest/tracking.html) (like Databricks) and at the end, you have the metadata for each run. (model version, input parameters, final metrics)
+
+![](readme/list.png)
+
+![](readme/compare.png)
+
 ### Deploy
 After the traning has finished, the pipeline builds a [Docker image](https://mlflow.org/docs/latest/models.html#local-model-deployment) from your trianed model and pushes that to the registry as the deploy image. 
 
