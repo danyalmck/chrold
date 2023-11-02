@@ -88,3 +88,14 @@ jobs:
         mlflow artifacts download -r "${{ env.MY_RUN }}" -d .
         mlflow models build-docker --model-uri ./model --name ghcr.io/${{ env.REPO_OWNER }}/${{ env.DEPLOY_IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
         docker push ghcr.io/${{ env.REPO_OWNER }}/${{ env.DEPLOY_IMAGE_NAME }}:${{ env.DEPLOY_TAG }}
+  
+  deploy:
+    container: hamravesh/darkube-cli:v1.1
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+    - name: darkube-cli deploy
+      run: |
+        darkube deploy --token ${{secrets.DEPLOY_TOKEN_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}
+        --app-id ${{secrets.APP_ID_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}} --image-tag ${{ env.DEPLOY_TAG }}
+        --job-id ${GITHUB_RUN_ID}
