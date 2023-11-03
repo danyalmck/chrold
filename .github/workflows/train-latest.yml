@@ -1,4 +1,4 @@
-name: Train and build the deploy image with latest tag
+name: Train and deploy the latest tag
 
 on: [workflow_dispatch]
 
@@ -63,5 +63,5 @@ jobs:
           -H 'Content-Type: application/json' -d '{ \
           "trigger_deploy_token": "${{secrets.DEPLOY_TOKEN_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", \
           "app_id": "${{secrets.APP_ID_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", \
-          "image_tag": "${{ env.DEPLOY_TAG }}" \
+          "image_tag": "${{ env.LATEST_IMAGE_TAG }}" \
           }'
