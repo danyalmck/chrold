@@ -2,15 +2,12 @@ name: Deploy tag
 
 on: [workflow_dispatch]
 
-env:
-  DEPLOY_TAG: $(basename ${{ github.event.ref }} | cut -d '/' -f 2)
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
     - name: deploy
       run: |
-        echo ${{ env.DEPLOY_TAG }}
+        echo ${{ github.ref_name }}
         sudo apt install -y curl
-        curl -X PUT 'https://api.console.hamravesh.ir/api/v1/darkube/apps/update_from_cli/' -H 'Content-Type: application/json' -d '{"trigger_deploy_token": "${{secrets.DEPLOY_TOKEN_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", "app_id": "${{secrets.APP_ID_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", "image_tag": "${{ env.DEPLOY_TAG }}"}'
+        curl -X PUT 'https://api.console.hamravesh.ir/api/v1/darkube/apps/update_from_cli/' -H 'Content-Type: application/json' -d '{"trigger_deploy_token": "${{secrets.DEPLOY_TOKEN_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", "app_id": "${{secrets.APP_ID_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", "image_tag": "${{github.ref_name}}"}'
