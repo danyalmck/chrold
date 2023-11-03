@@ -59,9 +59,4 @@ jobs:
     - name: deploy
       run: |
         sudo apt install -y curl
-        curl -X PUT 'https://api.console.hamravesh.ir/api/v1/darkube/apps/update_from_cli/' \
-          -H 'Content-Type: application/json' -d '{ \
-          "trigger_deploy_token": "${{secrets.DEPLOY_TOKEN_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", \
-          "app_id": "${{secrets.APP_ID_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", \
-          "image_tag": "${{ env.LATEST_IMAGE_TAG }}" \
-          }'
+        curl -X PUT 'https://api.console.hamravesh.ir/api/v1/darkube/apps/update_from_cli/' -H 'Content-Type: application/json' -d '{"trigger_deploy_token": "${{secrets.DEPLOY_TOKEN_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", "app_id": "${{secrets.APP_ID_DEPLOY_CHROLD_STAGING_HAMRAVESH_C13}}", "image_tag": "${{ env.LATEST_IMAGE_TAG }}"}'
