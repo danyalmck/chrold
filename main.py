@@ -4,7 +4,7 @@ from src.train import train
 
 
 UESRNAME = os.environ.get("DATABRICKS_USERNAME")
-EXPERIMENT = "chrold-exp1"
+EXPERIMENT = "perceptron-exp-1"
 TRACKING_UI = "databricks"
 
 mlflow.set_tracking_uri(TRACKING_UI)
