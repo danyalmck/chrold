@@ -20,7 +20,7 @@ def train(current_run, warm_start, warm_start_run_id, df):
     X_test = sc.transform(X_test)
 
     # Create a Perceptron model
-    perceptron = Perceptron(max_iter=100, random_state=5)
+    perceptron = Perceptron(max_iter=110, random_state=8)
 
     # Train the model
     perceptron.fit(X_train, y_train)
